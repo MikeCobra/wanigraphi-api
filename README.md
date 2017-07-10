@@ -1,6 +1,7 @@
 # WaniGraphi
 
 [![Build Status](https://travis-ci.org/MikeCobra/wanigraphi-api.svg?branch=master)](https://travis-ci.org/MikeCobra/wanigraphi-api)
+[![Coverage Status](https://coveralls.io/repos/github/MikeCobra/wanigraphi-api/badge.svg?branch=master)](https://coveralls.io/github/MikeCobra/wanigraphi-api?branch=master)
 
 ## Introduction
 
