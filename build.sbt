@@ -1,5 +1,5 @@
 organization := "uk.co.mikecobra"
-name := "wanigraphi"
+name := "wanigraphi-api"
 version := "0.0.1-SNAPSHOT"
 scalaVersion := "2.12.2"
 
