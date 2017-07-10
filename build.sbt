@@ -17,3 +17,5 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions in Test ++= Seq("-Yrangepos")
+
+coverageEnabled := true
