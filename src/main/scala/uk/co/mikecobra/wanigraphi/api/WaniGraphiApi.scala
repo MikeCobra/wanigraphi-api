@@ -1,4 +1,4 @@
-package uk.co.mikecobra.wanigraphi
+package uk.co.mikecobra.wanigraphi.api
 
 import java.util.concurrent.{ExecutorService, Executors}
 

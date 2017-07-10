@@ -1,9 +1,8 @@
-package uk.co.mikecobra.wanigraphi
+package uk.co.mikecobra.wanigraphi.api
 
 import io.circe._
 import org.http4s._
 import org.http4s.circe._
-import org.http4s.server._
 import org.http4s.dsl._
 
 object HelloWorld {
