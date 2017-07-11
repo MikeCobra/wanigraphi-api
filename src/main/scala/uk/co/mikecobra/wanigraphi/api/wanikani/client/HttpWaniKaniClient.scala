@@ -1,4 +1,4 @@
-package uk.co.mikecobra.wanigraphi.api.wanikani.service
+package uk.co.mikecobra.wanigraphi.api.wanikani.client
 
 import fs2.Task
 import org.http4s.client.Client
@@ -6,7 +6,7 @@ import org.http4s.client.blaze.PooledHttp1Client
 import org.http4s.circe._
 import uk.co.mikecobra.wanigraphi.api.wanikani.model._
 
-class HttpWaniKaniService(host: String) extends WaniKaniService {
+class HttpWaniKaniClient(host: String) extends WaniKaniClient {
 
   val httpClient: Client = PooledHttp1Client()
 
@@ -27,6 +27,6 @@ class HttpWaniKaniService(host: String) extends WaniKaniService {
       .map(_.requestedInformation)
 }
 
-object HttpWaniKaniService {
-  def apply(host: String): HttpWaniKaniService = new HttpWaniKaniService(host)
+object HttpWaniKaniClient {
+  def apply(host: String): HttpWaniKaniClient = new HttpWaniKaniClient(host)
 }

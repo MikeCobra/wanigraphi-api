@@ -1,4 +1,4 @@
-package uk.co.mikecobra.wanigraphi.api.wanikani.service
+package uk.co.mikecobra.wanigraphi.api.wanikani.client
 
 import java.time.{LocalDateTime, ZoneOffset}
 
@@ -10,7 +10,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeAfterEach
 import uk.co.mikecobra.wanigraphi.api.wanikani.model._
 
-class HttpWaniKaniServiceSpec extends Specification with BeforeAfterEach {
+class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
 
   val port = 8080
   val host = "localhost"
@@ -69,7 +69,7 @@ class HttpWaniKaniServiceSpec extends Specification with BeforeAfterEach {
         vacationDate = Some(LocalDateTime.ofEpochSecond(1480643132, 0, ZoneOffset.UTC))
       )
 
-      val service = HttpWaniKaniService(s"http://$host:$port")
+      val service = HttpWaniKaniClient(s"http://$host:$port")
 
       val result = service.getUserInformation("fakeApiKey")
 
@@ -168,7 +168,7 @@ class HttpWaniKaniServiceSpec extends Specification with BeforeAfterEach {
         )
       )
 
-      val service = HttpWaniKaniService(s"http://$host:$port")
+      val service = HttpWaniKaniClient(s"http://$host:$port")
 
       val result = service.getKanjiList("fakeApiKey")
 
@@ -259,7 +259,7 @@ class HttpWaniKaniServiceSpec extends Specification with BeforeAfterEach {
         )
       )
 
-      val service = HttpWaniKaniService(s"http://$host:$port")
+      val service = HttpWaniKaniClient(s"http://$host:$port")
 
       val result = service.getRadicalsList("fakeApiKey")
 
@@ -352,7 +352,7 @@ class HttpWaniKaniServiceSpec extends Specification with BeforeAfterEach {
         )
       )
 
-      val service = HttpWaniKaniService(s"http://$host:$port")
+      val service = HttpWaniKaniClient(s"http://$host:$port")
 
       val result = service.getVocabularyList("fakeApiKey")
 
