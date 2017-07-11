@@ -6,8 +6,8 @@ import io.circe.parser._
 import org.specs2.mutable.Specification
 
 class UserInformationSpec extends Specification {
-  "UserInformation" >> {
-    "should parse JSON" >> {
+  "UserInformation" should {
+    "parse JSON" in {
       val userInformationJson: String =
         """
           |{

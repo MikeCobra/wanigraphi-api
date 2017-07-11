@@ -6,8 +6,8 @@ import io.circe.parser._
 import org.specs2.mutable.Specification
 
 class RadicalSpec extends Specification {
-  "Radical" >> {
-    "should parse JSON with character" >> {
+  "Radical" should {
+    "parse JSON with character" in {
       val radicalWithCharacterJson: String =
         """
           |{
@@ -70,7 +70,7 @@ class RadicalSpec extends Specification {
       result shouldEqual Right(expected)
     }
 
-    "should parse JSON with image" >> {
+    "parse JSON with image" in {
       val radicalWithCharacterJson: String =
         """
           |{

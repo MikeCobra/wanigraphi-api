@@ -7,8 +7,8 @@ import org.specs2.mutable.Specification
 
 class UserSpecificSpec extends Specification {
 
-  "UserSpecific" >> {
-    "should parse standard JSON" >> {
+  "UserSpecific" should {
+    "parse standard JSON" in {
       val userSpecificStandardJson: String =
         """
           |{
@@ -61,7 +61,7 @@ class UserSpecificSpec extends Specification {
       result shouldEqual Right(expected)
     }
 
-    "should parse JSON with 0 burned date" >> {
+    "parse JSON with 0 burned date" in {
       val userSpecificZeroBurnedDateJson: String =
         """
           |{
@@ -114,7 +114,7 @@ class UserSpecificSpec extends Specification {
       result shouldEqual Right(expected)
     }
 
-    "should parse JSON with never available date" >> {
+    "parse JSON with never available date" in {
       val userSpecificZeroBurnedDateJson: String =
         """
           |{
@@ -167,7 +167,7 @@ class UserSpecificSpec extends Specification {
       result shouldEqual Right(expected)
     }
 
-    "should parse JSON with no reading statistics" >> {
+    "parse JSON with no reading statistics" in {
       val userSpecificNoReadingStatsJson: String =
         """
           |{
@@ -215,7 +215,7 @@ class UserSpecificSpec extends Specification {
       result shouldEqual Right(expected)
     }
 
-    "should parse JSON with empty user synonyms" >> {
+    "parse JSON with empty user synonyms" in {
       val userSpecificNoReadingStatsJson: String =
         """
           |{

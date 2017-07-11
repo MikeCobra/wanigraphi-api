@@ -6,8 +6,8 @@ import io.circe.parser.decode
 import org.specs2.mutable.Specification
 
 class ApiResponseSpec extends Specification {
-  "ApiResponse" >> {
-    "should parse JSON with a list" >> {
+  "ApiResponse" should {
+    "parse JSON with a list" in {
       val responseWithListJson: String =
         """
           |{
