@@ -7,6 +7,7 @@ val Http4sVersion = "0.17.0-M3"
 
 libraryDependencies ++= Seq(
   "org.http4s"     %% "http4s-blaze-server" % Http4sVersion,
+  "org.http4s"     %% "http4s-blaze-client" % Http4sVersion,
   "org.http4s"     %% "http4s-circe"        % Http4sVersion,
   "org.http4s"     %% "http4s-dsl"          % Http4sVersion,
   "io.circe"       %% "circe-generic"       % "0.8.0",
@@ -16,7 +17,8 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.specs2" %% "specs2-core" % "3.9.1" % "test"
+  "org.specs2"             %% "specs2-core"         % "3.9.1" % "test",
+  "com.github.tomakehurst" %  "wiremock-standalone" % "2.6.0" % "test"
 )
 
 scalacOptions in Test ++= Seq("-Yrangepos")

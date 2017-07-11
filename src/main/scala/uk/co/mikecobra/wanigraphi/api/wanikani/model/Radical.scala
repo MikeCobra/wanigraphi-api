@@ -1,4 +1,4 @@
-package uk.co.mikecobra.wanigraphi.api.model
+package uk.co.mikecobra.wanigraphi.api.wanikani.model
 
 import io.circe.Decoder
 
