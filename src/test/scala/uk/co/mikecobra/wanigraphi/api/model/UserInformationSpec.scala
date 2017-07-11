@@ -18,7 +18,7 @@ class UserInformationSpec extends Specification {
     |    "topics_count": 0,
     |    "posts_count": 0,
     |    "creation_date": 1480679357,
-    |    "vacation_date": null
+    |    "vacation_date": 1480643132
     |  }
   """.stripMargin
 
@@ -35,7 +35,7 @@ class UserInformationSpec extends Specification {
         0,
         0,
         LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
-        None
+        Some(LocalDateTime.ofEpochSecond(1480643132, 0, ZoneOffset.UTC))
       )
 
       val result = decode[UserInformation](userInformationJson)
