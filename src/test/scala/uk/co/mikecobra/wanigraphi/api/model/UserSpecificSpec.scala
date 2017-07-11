@@ -168,7 +168,7 @@ class UserSpecificSpec extends Specification {
     }
 
     "should parse JSON with no reading statistics" >> {
-      val userSpecificZeroBurnedDateJson: String =
+      val userSpecificNoReadingStatsJson: String =
         """
           |{
           |        "srs": "burned",
@@ -210,7 +210,55 @@ class UserSpecificSpec extends Specification {
         userSynonyms = Seq("deux", "one plus one")
       )
 
-      val result = decode[UserSpecific](userSpecificZeroBurnedDateJson)
+      val result = decode[UserSpecific](userSpecificNoReadingStatsJson)
+
+      result shouldEqual Right(expected)
+    }
+
+    "should parse JSON with empty user synonyms" >> {
+      val userSpecificNoReadingStatsJson: String =
+        """
+          |{
+          |        "srs": "burned",
+          |        "srs_numeric": 9,
+          |        "unlocked_date": 1480679357,
+          |        "available_date": 5099288400,
+          |        "burned": true,
+          |        "burned_date": 1480689357,
+          |        "meaning_correct": 8,
+          |        "meaning_incorrect": 0,
+          |        "meaning_max_streak": 8,
+          |        "meaning_current_streak": 8,
+          |        "reading_correct": null,
+          |        "reading_incorrect": null,
+          |        "reading_max_streak": null,
+          |        "reading_current_streak": null,
+          |        "meaning_note": "means two",
+          |        "reading_note": "sounds like knee",
+          |        "user_synonyms": null
+          |      }
+        """.stripMargin
+
+      val expected = UserSpecific(
+        srs = "burned",
+        srsNumeric = 9,
+        unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
+        availableDate = None,
+        burned = true,
+        burned_date = Some(LocalDateTime.ofEpochSecond(1480689357, 0, ZoneOffset.UTC)),
+        meaningStats = SrsStats(
+          correct = 8,
+          incorrect = 0,
+          maxStreak = 8,
+          currentStreak = 8
+        ),
+        readingStats = None,
+        meaningNote = Some("means two"),
+        readingNote = Some("sounds like knee"),
+        userSynonyms = Seq()
+      )
+
+      val result = decode[UserSpecific](userSpecificNoReadingStatsJson)
 
       result shouldEqual Right(expected)
     }

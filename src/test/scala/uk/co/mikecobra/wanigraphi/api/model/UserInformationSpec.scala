@@ -6,24 +6,25 @@ import io.circe.parser._
 import org.specs2.mutable.Specification
 
 class UserInformationSpec extends Specification {
-  val userInformationJson: String = """
-    |{
-    |    "username": "MikeCobra",
-    |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
-    |    "level": 14,
-    |    "title": "Turtles",
-    |    "about": "",
-    |    "website": null,
-    |    "twitter": null,
-    |    "topics_count": 0,
-    |    "posts_count": 0,
-    |    "creation_date": 1480679357,
-    |    "vacation_date": 1480643132
-    |  }
-  """.stripMargin
-
   "UserInformation" >> {
     "should parse JSON" >> {
+      val userInformationJson: String =
+        """
+          |{
+          |    "username": "MikeCobra",
+          |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
+          |    "level": 14,
+          |    "title": "Turtles",
+          |    "about": "",
+          |    "website": null,
+          |    "twitter": null,
+          |    "topics_count": 0,
+          |    "posts_count": 0,
+          |    "creation_date": 1480679357,
+          |    "vacation_date": 1480643132
+          |  }
+        """.stripMargin
+
       val expected = UserInformation(
         username = "MikeCobra",
         gravatar = "6f072b92be8107f47522f2e8c359c7b0",

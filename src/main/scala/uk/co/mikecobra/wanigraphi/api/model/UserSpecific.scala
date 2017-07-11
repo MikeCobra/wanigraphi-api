@@ -62,7 +62,7 @@ object UserSpecific {
         readingCurrentStreak: Option[Int],
         meaningNote: Option[String],
         readingNote: Option[String],
-        userSynonyms: Seq[String]
+        userSynonyms: Option[Seq[String]]
       ) =>
     UserSpecific(
       srs,
@@ -83,7 +83,7 @@ object UserSpecific {
         readingCurrentStreak),
       meaningNote,
       readingNote,
-      userSynonyms
+      userSynonyms.getOrElse(Seq())
     )
   }
 
@@ -106,5 +106,4 @@ object UserSpecific {
   private def handleBurnedDate(epoch: Long): Option[LocalDateTime] =
     if (epoch == 0L) None
     else Some(LocalDateTime.ofEpochSecond(epoch, 0, ZoneOffset.UTC))
-
 }
