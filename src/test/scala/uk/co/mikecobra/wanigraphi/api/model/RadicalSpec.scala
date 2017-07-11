@@ -50,7 +50,7 @@ class RadicalSpec extends Specification {
           unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
           availableDate = None,
           burned = true,
-          burned_date = Some(LocalDateTime.ofEpochSecond(1499105095, 0, ZoneOffset.UTC)),
+          burnedDate = Some(LocalDateTime.ofEpochSecond(1499105095, 0, ZoneOffset.UTC)),
           meaningStats = SrsStats(
             correct = 8,
             incorrect = 0,
@@ -113,7 +113,7 @@ class RadicalSpec extends Specification {
           unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
           availableDate = Some(LocalDateTime.ofEpochSecond(1500321600, 0, ZoneOffset.UTC)),
           burned = false,
-          burned_date = None,
+          burnedDate = None,
           meaningStats = SrsStats(
             correct = 10,
             incorrect = 2,

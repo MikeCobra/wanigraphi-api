@@ -17,7 +17,7 @@ case class UserSpecific(
                          unlockedDate: LocalDateTime,
                          availableDate: Option[LocalDateTime],
                          burned: Boolean,
-                         burned_date: Option[LocalDateTime],
+                         burnedDate: Option[LocalDateTime],
                          meaningStats: SrsStats,
                          readingStats: Option[SrsStats],
                          meaningNote: Option[String],
