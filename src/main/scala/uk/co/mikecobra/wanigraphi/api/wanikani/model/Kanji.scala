@@ -28,7 +28,7 @@ object Kanji {
     character: String,
     meaning: String,
     onyomi: String,
-    kunyomi: String,
+    kunyomi: Option[String],
     importantReading: String,
     nanori: Option[String],
     userSpecific: UserSpecific
@@ -38,7 +38,7 @@ object Kanji {
       character,
       splitCommaDelimited(meaning),
       splitCommaDelimited(onyomi),
-      splitCommaDelimited(kunyomi),
+      kunyomi.map(splitCommaDelimited).getOrElse(Seq()),
       importantReading,
       nanori,
       userSpecific
