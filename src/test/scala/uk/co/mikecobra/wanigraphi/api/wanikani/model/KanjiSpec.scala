@@ -217,5 +217,76 @@ class KanjiSpec extends Specification {
 
       result shouldEqual Right(expected)
     }
+
+    "parse JSON with null onyomi" in {
+      val kanjiWithNullOnyomiJson =
+        """
+          |{
+          |  "level": 41,
+          |  "character": "畑",
+          |  "meaning": "field",
+          |  "onyomi": null,
+          |  "kunyomi": "はたけ, はた",
+          |  "important_reading": "kunyomi",
+          |  "nanori": null,
+          |  "user_specific": {
+          |    "srs": "burned",
+          |    "srs_numeric": 9,
+          |    "unlocked_date": 1480839042,
+          |    "available_date": 5099324400,
+          |    "burned": true,
+          |    "burned_date": 1499327018,
+          |    "meaning_correct": 8,
+          |    "meaning_incorrect": 0,
+          |    "meaning_max_streak": 8,
+          |    "meaning_current_streak": 8,
+          |    "reading_correct": 8,
+          |    "reading_incorrect": 0,
+          |    "reading_max_streak": 8,
+          |    "reading_current_streak": 8,
+          |    "meaning_note": null,
+          |    "reading_note": null,
+          |    "user_synonyms": null
+          |  }
+          |}
+        """.stripMargin.stripMargin
+
+      val expected = Kanji(
+        level = 41,
+        character = "畑",
+        meaning = Seq("field"),
+        onyomi = Seq(),
+        kunyomi = Seq("はたけ", "はた"),
+        importantReading = "kunyomi",
+        nanori = None,
+        userSpecific = UserSpecific(
+          srs = "burned",
+          srsNumeric = 9,
+          unlockedDate = LocalDateTime.ofEpochSecond(1480839042, 0, ZoneOffset.UTC),
+          availableDate = None,
+          burned = true,
+          burnedDate = Some(LocalDateTime.ofEpochSecond(1499327018, 0, ZoneOffset.UTC)),
+          meaningStats = SrsStats(
+            correct = 8,
+            incorrect = 0,
+            maxStreak = 8,
+            currentStreak = 8
+          ),
+          readingStats = Some(SrsStats(
+            correct = 8,
+            incorrect = 0,
+            maxStreak = 8,
+            currentStreak = 8
+          )),
+          meaningNote = None,
+          readingNote = None,
+          userSynonyms = Seq()
+        )
+      )
+
+      val result = decode[Kanji](kanjiWithNullOnyomiJson)
+
+      result shouldEqual Right(expected)
+    }
   }
 }
