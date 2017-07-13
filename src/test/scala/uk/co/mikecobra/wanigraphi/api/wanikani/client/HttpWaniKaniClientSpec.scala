@@ -6,26 +6,28 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
-import org.specs2.mutable.Specification
-import org.specs2.specification.BeforeAfterEach
+import org.specs2.mutable.{BeforeAfter, Specification}
 import uk.co.mikecobra.wanigraphi.api.wanikani.model._
 
-class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
+class HttpWaniKaniClientSpec extends Specification {
+  sequential // Every test needs to do stuff with WireMock
 
   val port = 8080
   val host = "localhost"
 
-  val wireMockServer = new WireMockServer(wireMockConfig().port(port))
+  trait StubServer extends BeforeAfter {
+    val wireMockServer = new WireMockServer(wireMockConfig().port(port))
 
-  def before: Unit = {
-    wireMockServer.start()
-    WireMock.configureFor(host, port)
+    def before = {
+      wireMockServer.start()
+      WireMock.configureFor(host, port)
+    }
+
+    def after = wireMockServer.stop()
   }
 
-  def after: Unit = wireMockServer.stop()
-
   "HttpWaniKaniService" should {
-    "retrieve user information from the WaniKaniApi" in {
+    "retrieve user information from the WaniKaniApi" in new StubServer {
       val waniKaniResponse =
         """
           |{
@@ -76,7 +78,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
       result.unsafeRun shouldEqual expected
     }
 
-    "retrieve kanji list from the WankiKani Api" in {
+    "retrieve kanji list from the WankiKani Api" in new StubServer {
       val wanikaniResponse: String =
         """
           |{
@@ -101,25 +103,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           |      "kunyomi": "かわ",
           |      "important_reading": "kunyomi",
           |      "nanori": null,
-          |      "user_specific": {
-          |        "srs": "burned",
-          |        "srs_numeric": 9,
-          |        "unlocked_date": 1480838989,
-          |        "available_date": 5099108400,
-          |        "burned": true,
-          |        "burned_date": 1499109857,
-          |        "meaning_correct": 8,
-          |        "meaning_incorrect": 0,
-          |        "meaning_max_streak": 8,
-          |        "meaning_current_streak": 8,
-          |        "reading_correct": 8,
-          |        "reading_incorrect": 0,
-          |        "reading_max_streak": 8,
-          |        "reading_current_streak": 8,
-          |        "meaning_note": null,
-          |        "reading_note": null,
-          |        "user_synonyms": null
-          |      }
+          |      "user_specific": null
           |    }]
           |}
         """.stripMargin
@@ -142,30 +126,8 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           kunyomi = Seq("かわ"),
           importantReading = "kunyomi",
           nanori = None,
-          userSpecific = Some(UserSpecific(
-            srs = "burned",
-            srsNumeric = 9,
-            unlockedDate = LocalDateTime.ofEpochSecond(1480838989, 0, ZoneOffset.UTC),
-            availableDate = None,
-            burned = true,
-            burnedDate = Some(LocalDateTime.ofEpochSecond(1499109857, 0, ZoneOffset.UTC)),
-            meaningStats = SrsStats(
-              correct = 8,
-              incorrect = 0,
-              maxStreak = 8,
-              currentStreak = 8
-            ),
-            readingStats = Some(SrsStats(
-              correct = 8,
-              incorrect = 0,
-              maxStreak = 8,
-              currentStreak = 8
-            )),
-            meaningNote = None,
-            readingNote = None,
-            userSynonyms = Seq()
-          )
-        ))
+          userSpecific = None
+        )
       )
 
       val service = HttpWaniKaniClient(s"http://$host:$port")
@@ -175,7 +137,123 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
       result.unsafeRun shouldEqual expected
     }
 
-    "retrieve radical list from the WankiKani Api" in {
+    "retrieve kanji list for single level from the WankiKani Api" in new StubServer  {
+      val wanikaniResponse: String =
+        """
+          |{
+          |  "user_information": {
+          |    "username": "MikeCobra",
+          |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
+          |    "level": 14,
+          |    "title": "Turtles",
+          |    "about": "",
+          |    "website": null,
+          |    "twitter": null,
+          |    "topics_count": 0,
+          |    "posts_count": 0,
+          |    "creation_date": 1480679357,
+          |    "vacation_date": 1480643132
+          |  },
+          |  "requested_information": [{
+          |      "level": 1,
+          |      "character": "川",
+          |      "meaning": "river",
+          |      "onyomi": "せん",
+          |      "kunyomi": "かわ",
+          |      "important_reading": "kunyomi",
+          |      "nanori": null,
+          |      "user_specific": null
+          |    }]
+          |}
+        """.stripMargin
+
+      stubFor(get(urlEqualTo("/api/user/fakeApiKey/kanji/1"))
+        .willReturn(
+          aResponse()
+            .withBody(wanikaniResponse)
+            .withHeader("Content-type", "application/json")
+            .withStatus(200)
+        )
+      )
+
+      val expected = Seq(
+        Kanji(
+          level = 1,
+          character = "川",
+          meaning = Seq("river"),
+          onyomi = Seq("せん"),
+          kunyomi = Seq("かわ"),
+          importantReading = "kunyomi",
+          nanori = None,
+          userSpecific = None
+        ))
+
+      val service = HttpWaniKaniClient(s"http://$host:$port")
+
+      val result = service.getKanjiListForLevels("fakeApiKey", Seq(1))
+
+      result.unsafeRun shouldEqual expected
+    }
+
+    "retrieve kanji list for multiple levels from the WankiKani Api" in new StubServer  {
+      val wanikaniResponse: String =
+        """
+          |{
+          |  "user_information": {
+          |    "username": "MikeCobra",
+          |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
+          |    "level": 14,
+          |    "title": "Turtles",
+          |    "about": "",
+          |    "website": null,
+          |    "twitter": null,
+          |    "topics_count": 0,
+          |    "posts_count": 0,
+          |    "creation_date": 1480679357,
+          |    "vacation_date": 1480643132
+          |  },
+          |  "requested_information": [{
+          |      "level": 1,
+          |      "character": "川",
+          |      "meaning": "river",
+          |      "onyomi": "せん",
+          |      "kunyomi": "かわ",
+          |      "important_reading": "kunyomi",
+          |      "nanori": null,
+          |      "user_specific": null
+          |    }]
+          |}
+        """.stripMargin
+
+      stubFor(get(urlEqualTo("/api/user/fakeApiKey/kanji/1,3"))
+        .willReturn(
+          aResponse()
+            .withBody(wanikaniResponse)
+            .withHeader("Content-type", "application/json")
+            .withStatus(200)
+        )
+      )
+
+      val expected = Seq(
+        Kanji(
+          level = 1,
+          character = "川",
+          meaning = Seq("river"),
+          onyomi = Seq("せん"),
+          kunyomi = Seq("かわ"),
+          importantReading = "kunyomi",
+          nanori = None,
+          userSpecific = None
+        ))
+
+      val service = HttpWaniKaniClient(s"http://$host:$port")
+
+      val result = service.getKanjiListForLevels("fakeApiKey", Seq(1,3))
+
+      result.unsafeRun shouldEqual expected
+    }
+
+    "retrieve radical list from the WankiKani Api" in new StubServer {
       val wanikaniResponse: String =
         """
           |{
@@ -199,25 +277,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           |      "image_file_name": null,
           |      "image_content_type": null,
           |      "image_file_size": null,
-          |      "user_specific": {
-          |        "srs": "burned",
-          |        "srs_numeric": 9,
-          |        "unlocked_date": 1480679357,
-          |        "available_date": 5099104800,
-          |        "burned": true,
-          |        "burned_date": 1499105095,
-          |        "meaning_correct": 8,
-          |        "meaning_incorrect": 0,
-          |        "meaning_max_streak": 8,
-          |        "meaning_current_streak": 8,
-          |        "reading_correct": null,
-          |        "reading_incorrect": null,
-          |        "reading_max_streak": null,
-          |        "reading_current_streak": null,
-          |        "meaning_note": null,
-          |        "reading_note": null,
-          |        "user_synonyms": null
-          |      },
+          |      "user_specific": null,
           |      "image": null
           |  }]
           |}
@@ -237,24 +297,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           level = 1,
           character = Some("一"),
           meaning = "ground",
-          userSpecific = Some(UserSpecific(
-            srs = "burned",
-            srsNumeric = 9,
-            unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
-            availableDate = None,
-            burned = true,
-            burnedDate = Some(LocalDateTime.ofEpochSecond(1499105095, 0, ZoneOffset.UTC)),
-            meaningStats = SrsStats(
-              correct = 8,
-              incorrect = 0,
-              maxStreak = 8,
-              currentStreak = 8
-            ),
-            readingStats = None,
-            meaningNote = None,
-            readingNote = None,
-            userSynonyms = Seq()
-          )),
+          userSpecific = None,
           imageData = None
         )
       )
@@ -266,7 +309,119 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
       result.unsafeRun shouldEqual expected
     }
 
-    "retrieve vocabulary list from the WankiKani Api" in {
+    "retrieve radical list for single level from the WankiKani Api" in new StubServer {
+      val wanikaniResponse: String =
+        """
+          |{
+          |  "user_information": {
+          |    "username": "MikeCobra",
+          |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
+          |    "level": 14,
+          |    "title": "Turtles",
+          |    "about": "",
+          |    "website": null,
+          |    "twitter": null,
+          |    "topics_count": 0,
+          |    "posts_count": 0,
+          |    "creation_date": 1480679357,
+          |    "vacation_date": 1480643132
+          |  },
+          |  "requested_information": [{
+          |      "level": 1,
+          |      "character": "一",
+          |      "meaning": "ground",
+          |      "image_file_name": null,
+          |      "image_content_type": null,
+          |      "image_file_size": null,
+          |      "user_specific": null,
+          |      "image": null
+          |  }]
+          |}
+        """.stripMargin
+
+      stubFor(get(urlEqualTo("/api/user/fakeApiKey/radicals/1"))
+        .willReturn(
+          aResponse()
+            .withBody(wanikaniResponse)
+            .withHeader("Content-type", "application/json")
+            .withStatus(200)
+        )
+      )
+
+      val expected = Seq(
+        Radical(
+          level = 1,
+          character = Some("一"),
+          meaning = "ground",
+          userSpecific = None,
+          imageData = None
+        )
+      )
+
+      val service = HttpWaniKaniClient(s"http://$host:$port")
+
+      val result = service.getRadicalsListForLevels("fakeApiKey", Seq(1))
+
+      result.unsafeRun shouldEqual expected
+    }
+
+    "retrieve radical list for multiple levels from the WankiKani Api" in new StubServer {
+      val wanikaniResponse: String =
+        """
+          |{
+          |  "user_information": {
+          |    "username": "MikeCobra",
+          |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
+          |    "level": 14,
+          |    "title": "Turtles",
+          |    "about": "",
+          |    "website": null,
+          |    "twitter": null,
+          |    "topics_count": 0,
+          |    "posts_count": 0,
+          |    "creation_date": 1480679357,
+          |    "vacation_date": 1480643132
+          |  },
+          |  "requested_information": [{
+          |      "level": 1,
+          |      "character": "一",
+          |      "meaning": "ground",
+          |      "image_file_name": null,
+          |      "image_content_type": null,
+          |      "image_file_size": null,
+          |      "user_specific": null,
+          |      "image": null
+          |  }]
+          |}
+        """.stripMargin
+
+      stubFor(get(urlEqualTo("/api/user/fakeApiKey/radicals/1,4"))
+        .willReturn(
+          aResponse()
+            .withBody(wanikaniResponse)
+            .withHeader("Content-type", "application/json")
+            .withStatus(200)
+        )
+      )
+
+      val expected = Seq(
+        Radical(
+          level = 1,
+          character = Some("一"),
+          meaning = "ground",
+          userSpecific = None,
+          imageData = None
+        )
+      )
+
+      val service = HttpWaniKaniClient(s"http://$host:$port")
+
+      val result = service.getRadicalsListForLevels("fakeApiKey", Seq(1, 4))
+
+      result.unsafeRun shouldEqual expected
+    }
+
+    "retrieve vocabulary list from the WankiKani Api" in new StubServer {
       val wanikaniResponse: String =
         """
           |{
@@ -288,25 +443,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           |     "character": "アメリカ人",
           |     "kana": "あめりかじん, アメリカじん",
           |     "meaning": "american, american person",
-          |     "user_specific": {
-          |       "srs": "burned",
-          |       "srs_numeric": 9,
-          |       "unlocked_date": 1481007840,
-          |       "available_date": 5099281200,
-          |       "burned": true,
-          |       "burned_date": 1499284424,
-          |       "meaning_correct": 10,
-          |       "meaning_incorrect": 1,
-          |       "meaning_max_streak": 7,
-          |       "meaning_current_streak": 7,
-          |       "reading_correct": 10,
-          |       "reading_incorrect": 0,
-          |       "reading_max_streak": 10,
-          |       "reading_current_streak": 10,
-          |       "meaning_note": null,
-          |       "reading_note": null,
-                  "user_synonyms": null
-          |     }
+          |     "user_specific": null
           |  }]
           |}
         """.stripMargin
@@ -326,35 +463,117 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           character = "アメリカ人",
           kana = Seq("あめりかじん", "アメリカじん"),
           meaning = Seq("american", "american person"),
-          userSpecific = Some(UserSpecific(
-            srs = "burned",
-            srsNumeric = 9,
-            unlockedDate = LocalDateTime.ofEpochSecond(1481007840, 0, ZoneOffset.UTC),
-            availableDate = None,
-            burned = true,
-            burnedDate = Some(LocalDateTime.ofEpochSecond(1499284424, 0, ZoneOffset.UTC)),
-            meaningStats = SrsStats(
-              correct = 10,
-              incorrect = 1,
-              maxStreak = 7,
-              currentStreak = 7
-            ),
-            readingStats = Some(SrsStats(
-              correct = 10,
-              incorrect = 0,
-              maxStreak = 10,
-              currentStreak = 10
-            )),
-            meaningNote = None,
-            readingNote = None,
-            userSynonyms = Seq()
-          )
-        ))
+          userSpecific = None
+        )
       )
 
       val service = HttpWaniKaniClient(s"http://$host:$port")
 
       val result = service.getVocabularyList("fakeApiKey")
+
+      result.unsafeRun shouldEqual expected
+    }
+
+    "retrieve vocabulary list for single level from the WankiKani Api" in new StubServer  {
+      val wanikaniResponse: String =
+        """
+          |{
+          |  "user_information": {
+          |    "username": "MikeCobra",
+          |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
+          |    "level": 14,
+          |    "title": "Turtles",
+          |    "about": "",
+          |    "website": null,
+          |    "twitter": null,
+          |    "topics_count": 0,
+          |    "posts_count": 0,
+          |    "creation_date": 1480679357,
+          |    "vacation_date": 1480643132
+          |  },
+          |  "requested_information": [{
+          |     "level": 1,
+          |     "character": "アメリカ人",
+          |     "kana": "あめりかじん, アメリカじん",
+          |     "meaning": "american, american person",
+          |     "user_specific": null
+          |  }]
+          |}
+        """.stripMargin
+
+      stubFor(get(urlEqualTo("/api/user/fakeApiKey/vocabulary/1"))
+        .willReturn(
+          aResponse()
+            .withBody(wanikaniResponse)
+            .withHeader("Content-type", "application/json")
+            .withStatus(200)
+        )
+      )
+
+      val expected = Seq(
+        Vocabulary(
+          level = 1,
+          character = "アメリカ人",
+          kana = Seq("あめりかじん", "アメリカじん"),
+          meaning = Seq("american", "american person"),
+          userSpecific = None
+      ))
+
+      val service = HttpWaniKaniClient(s"http://$host:$port")
+
+      val result = service.getVocabularyListForLevels("fakeApiKey", Seq(1))
+
+      result.unsafeRun shouldEqual expected
+    }
+
+    "retrieve vocabulary list for multiple levels from the WankiKani Api" in new StubServer {
+      val wanikaniResponse: String =
+        """
+          |{
+          |  "user_information": {
+          |    "username": "MikeCobra",
+          |    "gravatar": "6f072b92be8107f47522f2e8c359c7b0",
+          |    "level": 14,
+          |    "title": "Turtles",
+          |    "about": "",
+          |    "website": null,
+          |    "twitter": null,
+          |    "topics_count": 0,
+          |    "posts_count": 0,
+          |    "creation_date": 1480679357,
+          |    "vacation_date": 1480643132
+          |  },
+          |  "requested_information": [{
+          |     "level": 1,
+          |     "character": "アメリカ人",
+          |     "kana": "あめりかじん, アメリカじん",
+          |     "meaning": "american, american person",
+          |     "user_specific": null
+          |  }]
+          |}
+        """.stripMargin
+
+      stubFor(get(urlEqualTo("/api/user/fakeApiKey/vocabulary/1,2"))
+        .willReturn(
+          aResponse()
+            .withBody(wanikaniResponse)
+            .withHeader("Content-type", "application/json")
+            .withStatus(200)
+        )
+      )
+
+      val expected = Seq(
+        Vocabulary(
+          level = 1,
+          character = "アメリカ人",
+          kana = Seq("あめりかじん", "アメリカじん"),
+          meaning = Seq("american", "american person"),
+          userSpecific = None
+        ))
+
+      val service = HttpWaniKaniClient(s"http://$host:$port")
+
+      val result = service.getVocabularyListForLevels("fakeApiKey", Seq(1,2))
 
       result.unsafeRun shouldEqual expected
     }
