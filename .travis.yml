@@ -1,6 +1,13 @@
 language: scala
-dist: trusty # Required for Java 8
+dist: trusty
 scala:
-   - 2.12.2
-script: "sbt clean coverage test"
-after_success: "sbt coverageReport coveralls"
+  - 2.12.2
+script: sbt clean coverage test
+after_success: sbt coverageReport coveralls
+deploy:
+  provider: heroku
+  api_key:
+    secure: TjW8HpYm1P7HugQuK34kMh5wPkpNoyXfmdqnr12bdwOES29e8WoKBoyNbW1w4Yr9uWsRiTkvBlSMN33tDn65e/liZ50ZqnPI3QuYRIU4N5HXll2Gi/7p7ctkndW4HZpC2dyC2yTcoRrcm8FgE2M3PRwAnDzqlvuI8auytDa7QFpbTGYGmL6N6gcygtER0bo9V+95GLkwZlxIiy/roGEpiwFlJN3kBq14nKU+8vfTmEH6qDkd9ygC3oA3TXgH5cndjdBMvBaApa4+5bg9QZfzG6WkUbnu6Td+8F8Iackgc+qc6w5HxYGW8WuT9SD/7bfZgSeYMjsLFGNYnOCS/pUsraEtjJChrS2cdZHl2QxC+rVAY6eSSqeTK6e1swFHrsRK8DBNBjF/UwxIaEIxX6sLBxaJ8HlmjZ5S5gvDo+9yZqKm3KaCFcDsGtZ1uVhj9vsKwbUBuyXBYgwogOqvvZrkLrx+WWHdSudtXjZ0ZhZRp87m9DXT3/ldym0/t1lF2WbCYGVuIovhFJQJdKfGBbNabZGLo+1vjzRGethoU7k0Sdw+kh3hF//sAWynqfiv9QntOL/SUVxWUggLxnlIWh+mKLh9r7DAJ0M1OvYM0lFrwg5OTAaLWPZMJgrmus9DWPHv6PqZF851EW++61AfZlrtGdFr0pFqugsFfGa1P6RBcf0=
+  app: wanigraphi-api
+  on:
+    repo: MikeCobra/wanigraphi-api
