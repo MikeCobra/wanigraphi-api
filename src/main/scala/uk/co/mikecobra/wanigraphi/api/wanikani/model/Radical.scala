@@ -13,7 +13,7 @@ case class Radical(
                     level: Int,
                     character: Option[String],
                     meaning: String,
-                    userSpecific: UserSpecific,
+                    userSpecific: Option[UserSpecific],
                     imageData: Option[ImageData]
                   )
 
@@ -35,7 +35,7 @@ object Radical {
       imageFilename: Option[String],
       imageContentType: Option[String],
       imageFilesize: Option[Int],
-      userSpecific: UserSpecific,
+      userSpecific: Option[UserSpecific],
       imageUrl: Option[String]
     ) =>
       Radical(

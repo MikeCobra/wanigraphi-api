@@ -7,7 +7,7 @@ case class Vocabulary(
                   character: String,
                   kana: Seq[String],
                   meaning: Seq[String],
-                  userSpecific: UserSpecific
+                  userSpecific: Option[UserSpecific]
                 )
 
 object Vocabulary {
@@ -22,7 +22,7 @@ object Vocabulary {
        character: String,
        kana: String,
        meaning: String,
-       userSpecific: UserSpecific
+       userSpecific: Option[UserSpecific]
      ) =>
     Vocabulary(
       level,

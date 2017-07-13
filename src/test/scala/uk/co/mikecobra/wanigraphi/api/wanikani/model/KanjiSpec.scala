@@ -49,7 +49,7 @@ class KanjiSpec extends Specification {
         kunyomi = Seq("ふた"),
         importantReading = "onyomi",
         nanori = None,
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "burned",
           srsNumeric = 9,
           unlockedDate = LocalDateTime.ofEpochSecond(1480839063, 0, ZoneOffset.UTC),
@@ -71,10 +71,41 @@ class KanjiSpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        )
+        ))
       )
 
       val result = decode[Kanji](kanjiJson)
+
+      result shouldEqual Right(expected)
+    }
+
+    "parse JSON with null user specific data" in {
+      val kanjiWithNullUserSpecificJson: String =
+        """
+          |{
+          |  "level": 1,
+          |  "character": "二",
+          |  "meaning": "two",
+          |  "onyomi": "に",
+          |  "kunyomi": "ふた",
+          |  "important_reading": "onyomi",
+          |  "nanori": null,
+          |  "user_specific": null
+          |}
+        """.stripMargin
+
+      val expected = Kanji(
+        level = 1,
+        character = "二",
+        meaning = Seq("two"),
+        onyomi = Seq("に"),
+        kunyomi = Seq("ふた"),
+        importantReading = "onyomi",
+        nanori = None,
+        userSpecific = None
+      )
+
+      val result = decode[Kanji](kanjiWithNullUserSpecificJson)
 
       result shouldEqual Right(expected)
     }
@@ -119,7 +150,7 @@ class KanjiSpec extends Specification {
         kunyomi = Seq("した", "さが", "くだ", "お"),
         importantReading = "onyomi",
         nanori = None,
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "burned",
           srsNumeric = 9,
           unlockedDate = LocalDateTime.ofEpochSecond(1480839042, 0, ZoneOffset.UTC),
@@ -141,7 +172,7 @@ class KanjiSpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        )
+        ))
       )
 
       val result = decode[Kanji](kanjiWithListsJson)
@@ -188,7 +219,7 @@ class KanjiSpec extends Specification {
         kunyomi = Seq(),
         importantReading = "onyomi",
         nanori = None,
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "burned",
           srsNumeric = 9,
           unlockedDate = LocalDateTime.ofEpochSecond(1480839042, 0, ZoneOffset.UTC),
@@ -210,7 +241,7 @@ class KanjiSpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        )
+        ))
       )
 
       val result = decode[Kanji](kanjiWithNullKunyomiJson)
@@ -259,7 +290,7 @@ class KanjiSpec extends Specification {
         kunyomi = Seq("はたけ", "はた"),
         importantReading = "kunyomi",
         nanori = None,
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "burned",
           srsNumeric = 9,
           unlockedDate = LocalDateTime.ofEpochSecond(1480839042, 0, ZoneOffset.UTC),
@@ -281,7 +312,7 @@ class KanjiSpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        )
+        ))
       )
 
       val result = decode[Kanji](kanjiWithNullOnyomiJson)

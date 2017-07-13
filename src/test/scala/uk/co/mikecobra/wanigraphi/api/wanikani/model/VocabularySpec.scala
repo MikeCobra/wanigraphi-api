@@ -43,7 +43,7 @@ class VocabularySpec extends Specification {
         character = "十",
         kana = Seq("じゅう"),
         meaning = Seq("ten"),
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "enlighten",
           srsNumeric = 8,
           unlockedDate = LocalDateTime.ofEpochSecond(1481007820, 0, ZoneOffset.UTC),
@@ -65,10 +65,35 @@ class VocabularySpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        )
+        ))
       )
 
       val result = decode[Vocabulary](vocabularyJson)
+
+      result shouldEqual Right(expected)
+    }
+
+    "parse JSON" in {
+      val vocabularyWithNullUserSpecificJson: String =
+        """
+          |{
+          |  "level": 1,
+          |  "character": "十",
+          |  "kana": "じゅう",
+          |  "meaning": "ten",
+          |  "user_specific": null
+          |}
+        """.stripMargin
+
+      val expected = Vocabulary(
+        level = 1,
+        character = "十",
+        kana = Seq("じゅう"),
+        meaning = Seq("ten"),
+        userSpecific = None
+      )
+
+      val result = decode[Vocabulary](vocabularyWithNullUserSpecificJson)
 
       result shouldEqual Right(expected)
     }
@@ -107,7 +132,7 @@ class VocabularySpec extends Specification {
         character = "アメリカ人",
         kana = Seq("あめりかじん", "アメリカじん"),
         meaning = Seq("american", "american person"),
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "burned",
           srsNumeric = 9,
           unlockedDate = LocalDateTime.ofEpochSecond(1481007840, 0, ZoneOffset.UTC),
@@ -129,7 +154,7 @@ class VocabularySpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        )
+        ))
       )
 
       val result = decode[Vocabulary](vocabularyWithListsJson)

@@ -142,7 +142,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           kunyomi = Seq("かわ"),
           importantReading = "kunyomi",
           nanori = None,
-          userSpecific = UserSpecific(
+          userSpecific = Some(UserSpecific(
             srs = "burned",
             srsNumeric = 9,
             unlockedDate = LocalDateTime.ofEpochSecond(1480838989, 0, ZoneOffset.UTC),
@@ -165,7 +165,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
             readingNote = None,
             userSynonyms = Seq()
           )
-        )
+        ))
       )
 
       val service = HttpWaniKaniClient(s"http://$host:$port")
@@ -237,7 +237,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           level = 1,
           character = Some("一"),
           meaning = "ground",
-          userSpecific = UserSpecific(
+          userSpecific = Some(UserSpecific(
             srs = "burned",
             srsNumeric = 9,
             unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
@@ -254,7 +254,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
             meaningNote = None,
             readingNote = None,
             userSynonyms = Seq()
-          ),
+          )),
           imageData = None
         )
       )
@@ -326,7 +326,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
           character = "アメリカ人",
           kana = Seq("あめりかじん", "アメリカじん"),
           meaning = Seq("american", "american person"),
-          userSpecific = UserSpecific(
+          userSpecific = Some(UserSpecific(
             srs = "burned",
             srsNumeric = 9,
             unlockedDate = LocalDateTime.ofEpochSecond(1481007840, 0, ZoneOffset.UTC),
@@ -349,7 +349,7 @@ class HttpWaniKaniClientSpec extends Specification with BeforeAfterEach {
             readingNote = None,
             userSynonyms = Seq()
           )
-        )
+        ))
       )
 
       val service = HttpWaniKaniClient(s"http://$host:$port")

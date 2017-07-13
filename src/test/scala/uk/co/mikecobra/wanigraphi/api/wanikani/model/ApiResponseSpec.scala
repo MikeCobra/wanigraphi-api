@@ -74,7 +74,7 @@ class ApiResponseSpec extends Specification {
             level = 1,
             character = Some("一"),
             meaning = "ground",
-            userSpecific = UserSpecific(
+            userSpecific = Some(UserSpecific(
               srs = "burned",
               srsNumeric = 9,
               unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
@@ -91,7 +91,7 @@ class ApiResponseSpec extends Specification {
               meaningNote = None,
               readingNote = None,
               userSynonyms = Seq()
-            ),
+            )),
             imageData = None
           )
         )

@@ -10,7 +10,7 @@ case class Kanji(
                 kunyomi: Seq[String],
                 importantReading: String,
                 nanori: Option[String],
-                userSpecific: UserSpecific
+                userSpecific: Option[UserSpecific]
                 )
 
 object Kanji {
@@ -31,7 +31,7 @@ object Kanji {
     kunyomi: Option[String],
     importantReading: String,
     nanori: Option[String],
-    userSpecific: UserSpecific
+    userSpecific: Option[UserSpecific]
   ) =>
     Kanji(
       level,

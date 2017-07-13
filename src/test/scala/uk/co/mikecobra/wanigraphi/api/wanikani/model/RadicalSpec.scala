@@ -44,7 +44,7 @@ class RadicalSpec extends Specification {
         level = 1,
         character = Some("一"),
         meaning = "ground",
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "burned",
           srsNumeric = 9,
           unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
@@ -61,11 +61,39 @@ class RadicalSpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        ),
+        )),
         imageData = None
       )
 
       val result = decode[Radical](radicalWithCharacterJson)
+
+      result shouldEqual Right(expected)
+    }
+
+    "parse JSON with null user specific" in {
+      val radicalWithNullUserSpecificJson: String =
+        """
+          |{
+          |      "level": 1,
+          |      "character": "一",
+          |      "meaning": "ground",
+          |      "image_file_name": null,
+          |      "image_content_type": null,
+          |      "image_file_size": null,
+          |      "user_specific": null,
+          |      "image": null
+          |    }
+        """.stripMargin
+
+      val expected = Radical(
+        level = 1,
+        character = Some("一"),
+        meaning = "ground",
+        userSpecific = None,
+        imageData = None
+      )
+
+      val result = decode[Radical](radicalWithNullUserSpecificJson)
 
       result shouldEqual Right(expected)
     }
@@ -107,7 +135,7 @@ class RadicalSpec extends Specification {
         level = 1,
         character = None,
         meaning = "leaf",
-        userSpecific = UserSpecific(
+        userSpecific = Some(UserSpecific(
           srs = "guru",
           srsNumeric = 6,
           unlockedDate = LocalDateTime.ofEpochSecond(1480679357, 0, ZoneOffset.UTC),
@@ -124,7 +152,7 @@ class RadicalSpec extends Specification {
           meaningNote = None,
           readingNote = None,
           userSynonyms = Seq()
-        ),
+        )),
         imageData = Some(ImageData(
           filename = "leaf.png",
           contentType = "image/png",
