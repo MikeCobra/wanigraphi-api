@@ -2,8 +2,8 @@ package uk.co.mikecobra.wanigraphi.api.config
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-object WaniGraphiApiConfig {
-
+class WaniGraphiApiConfig() {
+  
   private val config: Config = ConfigFactory.load()
 
   object HttpConfig {
